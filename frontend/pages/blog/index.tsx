@@ -30,7 +30,7 @@ const Blog = () => {
         {posts.map((post) => (
           <div key={post.id}>
             <Link href="/blog/[id]" as={`/blog/${post.id}`}>
-              <a>{post.title}</a>
+              {post.title}
             </Link>
           </div>
         ))}
