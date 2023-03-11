@@ -25,6 +25,7 @@ class Tag(models.Model):
         verbose_name_plural = "タグ"
 
 
+# Blog記事のこと (POST メソッドのPOSTとは違う。confusingでごめんなさい)
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()

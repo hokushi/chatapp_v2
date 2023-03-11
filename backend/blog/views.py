@@ -12,7 +12,7 @@
 
 # よく使うクエリセット一覧
 # 基本: https://qiita.com/uenosy/items/54136aff0f6373957d22
-# ManyToMany: https://djangobrothers.com/blogs/many_to_many_object/
+# ManyToMany: https://djangobrothers.com/blogs/many_to_many_objects/
 
 # 必要なAPI
 # 1. ユーザー登録
@@ -21,6 +21,12 @@
 # 4. ブログの詳細を取得する
 # 5. ブログを更新する
 # 6. ブログを削除する
+
+# メソッド一覧
+# GET: データを取得する
+# POST: データを作成する
+# PUT: データを更新する
+# DELETE: データを削除する
 
 from .models import User, Post, Tag
 from django.http import JsonResponse
@@ -40,9 +46,12 @@ def UserView(request):
 
 
 @csrf_exempt
-def PostView(request):
+def BlogView(request):
     if request.method == "POST":
         data = json.loads(request.body)
+        if "content" not in data:
+            return JsonResponse({"error": "content is required"}, status=400)
+
         post = Post.objects.create(
             title=data["title"],
             content=data["content"],
@@ -54,6 +63,7 @@ def PostView(request):
                 "id": post.id,
                 "title": post.title,
                 "content": post.content,
+                "created_at": post.created_at,
                 "author": {
                     "id": post.author.id,
                     "name": post.author.name,
@@ -64,9 +74,11 @@ def PostView(request):
         )
 
     if request.method == "GET":
-        posts = Post.objects.all()
-        return JsonResponse(
-            [
+        posts = Post.objects.order_by("-created_at")
+        response = []
+
+        for post in posts:
+            response.append(
                 {
                     "id": post.id,
                     "title": post.title,
@@ -80,8 +92,10 @@ def PostView(request):
                     },
                     "tags": [{"id": tag.id, "name": tag.name} for tag in post.tags.all()],
                 }
-                for post in posts
-            ],
+            )
+
+        return JsonResponse(
+            response,
             status=200,
             safe=False,
         )
@@ -90,7 +104,7 @@ def PostView(request):
 
 
 @csrf_exempt
-def PostDetailView(request, post_id):
+def BlogDetailView(request, post_id):
     if request.method == "GET":
         post = get_object_or_404(Post, id=post_id)
         return JsonResponse(

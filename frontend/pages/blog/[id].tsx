@@ -1,27 +1,35 @@
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 
-const BLOG_API_URL = "http://localhost:3130/blog/";
 const Blog = () => {
-  const [posts, setPosts] = useState([]);
+  const router = useRouter();
+  const post_id = router.query.id;
+  const BLOG_DETAIL_API_URL = `http://localhost:3130/blog/${post_id}`;
+  const [post, setPost] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  // BlogDetailViewのAPIを叩く
   useEffect(() => {
-    axios.get(BLOG_API_URL).then((res) => setPosts(res.data));
-  }, []);
+    if (router.isReady) {
+      axios.get(BLOG_DETAIL_API_URL).then((res) => {
+        setPost(res.data);
+      });
+    }
+  }, [router]);
 
-  const createPost = () => {
+  const editPost = () => {
     axios
-      .post(BLOG_API_URL, {
+      .put(BLOG_DETAIL_API_URL, {
         title: title,
-        text: content,
+        content: content,
         author_id: 1,
         tag_ids: [],
       })
       .then((res) => {
-        setPosts([res.data, ...posts]);
+        alert("成功");
       })
       .catch((err) => {
         alert(err.code);
@@ -30,17 +38,7 @@ const Blog = () => {
 
   return (
     <>
-      <div>
-        <h1>Blog</h1>
-        {posts.map((post) => (
-          <div key={post.id}>
-            <Link href="/blog/[id]" as={`/blog/${post.id}`}>
-              {post.title}
-              {post.created_at}
-            </Link>
-          </div>
-        ))}
-      </div>
+      <div>{post && post.content}</div>
       <input
         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         autoFocus={true}
@@ -57,14 +55,9 @@ const Blog = () => {
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
-      <button onClick={createPost}>Create Post</button>
+      <button onClick={editPost}>Create Post</button>
     </>
   );
 };
 
 export default Blog;
-
-// TODO 1: 投稿日時も表示する
-// TODO 2: 入力BOXを用意し、記事を作成できるようにする（ユーザーは固定）
-// TODO 3: 記事詳細ページを作って繋げる
-// TODO 4: タグを選択できるようにする
