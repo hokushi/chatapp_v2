@@ -6,7 +6,7 @@ import InputHookform from "../components/input-hookform";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const Register = () => {
-  const USERS_URL = "http://localhost:8000/chatapp/user";
+  const USERS_URL = "http://localhost:3130/chat/userinfo";
   const router = useRouter();
 
   const {
@@ -18,22 +18,22 @@ const Register = () => {
   } = useForm<InputType>();
 
   type InputType = {
+    name: string;
     username: string;
-    uuid: string;
-    age: number;
-    mail: string;
-    callnumber: number;
+    email: string;
+    password: number;
   };
 
   const sendProfile: SubmitHandler<InputType> = (data) => {
-    const sendProfile = { name: data.username };
+    const id=uuid()
+    const sendProfile = { name: data.name , username: data.username, userid: id, email: data.email, password: data.password};
+    console.log(sendProfile)
     axios
       .post(USERS_URL, sendProfile)
       .then((res) => {
         axios.get(USERS_URL).then((res) => {
           console.log(res.data);
-          const id = res.data[res.data.length - 1].id;
-          router.push(`/select-chatroom/${id}`);
+          router.push(`select/${id}`);
         });
       })
       .catch((err) => {
@@ -41,9 +41,6 @@ const Register = () => {
       });
   };
 
-  const check = () => {
-    console.log(router);
-  };
 
   return (
     <>
@@ -55,36 +52,37 @@ const Register = () => {
           <form onSubmit={handleSubmit(sendProfile)} className="mt-5">
             <InputHookform
               entries="名前"
-              placeholder="ほくし"
+              placeholder="通知太郎"
               //reigster関数をpropsで渡す
               register={register}
-              name="username"
-              errors={errors.username}
+              name="name"
+              errors={errors.name}
+              type={"text"}
               RegisterOptions={{
-                maxLength: { value: 5, message: "※5文字以内でご記入ください" },
+                maxLength: { value: 10, message: "※10文字以内でご記入ください" },
                 required: "※名前は必須です。",
               }}
             />
             <InputHookform
-              entries="年齢"
-              placeholder="20"
+              entries="ユーザーネーム"
+              placeholder="通太郎"
+              //reigster関数をpropsで渡す
               register={register}
-              name="age"
-              errors={errors.age}
+              name="username"
+              errors={errors.username}
+              type={"text"}
               RegisterOptions={{
-                required: "※年齢は必須です。",
-                pattern: {
-                  value: /^[0-9]{2}$/,
-                  message: "※正確な年齢をご記入ください",
-                },
+                maxLength: { value: 10, message: "※10文字以内でご記入ください" },
+                required: "※ユーザーネームは必須です。",
               }}
             />
             <InputHookform
               entries="メールアドレス"
               placeholder="hokuhoku0909@icloud.com"
               register={register}
-              name="mail"
-              errors={errors.mail}
+              name="email"
+              errors={errors.email}
+              type={"text"}
               RegisterOptions={{
                 required: "※メールアドレスは必須です。",
                 pattern: {
@@ -94,17 +92,16 @@ const Register = () => {
               }}
             />
             <InputHookform
-              entries="電話番号"
-              placeholder="090-1234-5678"
+              entries="パスワード"
+              placeholder=""
               register={register}
-              name="callnumber"
-              errors={errors.callnumber}
+              name="password"
+              errors={errors.password}
+              type={"password"}
               RegisterOptions={{
-                required: "※電話番号は必須です。",
-                pattern: {
-                  value: /^0\d{2,3}-\d{1,4}-\d{4}$/,
-                  message: "正しい電話番号ではありません。",
-                },
+                minLength: { value: 4, message: "※4文字以上でご記入ください" },
+                required: "※パスワードは必須です。",
+                
               }}
             />
             <div className="grid grid-cols-11">
@@ -117,7 +114,6 @@ const Register = () => {
             </div>
           </form>
         </div>
-        <button onClick={check}>aa</button>
       </div>
     </>
   );

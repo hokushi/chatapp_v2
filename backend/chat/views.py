@@ -6,7 +6,6 @@ from .models import Room
 from .models import Message
 from .models import UserInfo
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -27,6 +26,7 @@ def user(request):
 
     if request.method == 'POST':
         datas = json.loads(request.body)
+        print(datas)
         name = datas['name']
         userid = datas['userid']
         username = datas['username']
