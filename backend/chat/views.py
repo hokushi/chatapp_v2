@@ -18,7 +18,7 @@ def user(request):
         for user in users:
             data.append({
                 'name': user.name,
-                'id': user.id,
+                'userid': user.userid,
                 'username': user.username,
                 'email': user.email,
                 'password': user.password,
@@ -28,10 +28,11 @@ def user(request):
     if request.method == 'POST':
         datas = json.loads(request.body)
         name = datas['name']
+        userid = datas['userid']
         username = datas['username']
         email = datas['email']
         password = datas['password']
-        UserInfo.objects.create(name=name, username=username,
+        UserInfo.objects.create(name=name, userid=userid, username=username,
                                 email=email, password=password)
         return HttpResponse('user登録完了！')
 

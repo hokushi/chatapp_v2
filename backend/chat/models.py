@@ -1,13 +1,10 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
-from django.contrib.auth.models import User
-
 
 class UserInfo(models.Model):
     name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
+    userid = models.CharField(max_length=255, unique=True)
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
 
