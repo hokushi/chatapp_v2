@@ -26,6 +26,7 @@ const Register = () => {
 
   const sendProfile: SubmitHandler<InputType> = (data) => {
     const id=uuid()
+    localStorage.setItem("myID", JSON.stringify(id));
     const sendProfile = { name: data.name , username: data.username, userid: id, email: data.email, password: data.password};
     console.log(sendProfile)
     axios

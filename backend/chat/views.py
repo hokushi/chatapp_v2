@@ -54,3 +54,30 @@ def room(request):
         name = datas['name']
         Room.objects.create(name=name)
         return HttpResponse('room登録完了！')
+
+
+@csrf_exempt
+def get_room_of_user(request, userid):
+    if request.method == 'GET':
+        user = UserInfo.objects.get(userid=userid)
+        rooms = user.rooms.all()
+        data = []
+        for room in rooms:
+            members = room.members.all()  # UserInfoインスタンスの配列
+            members_data = []
+            for member in members:
+                members_data.append({
+                    'name': member.name,
+                    'userid': member.userid,
+                    'username': member.username,
+                    'email': member.email,
+                    'password': member.password,
+                })
+            # members_dataは、Pythonの辞書の配列 (インスタンス→辞書に)
+            # 辞書はJSONにできる、インスタンスはJSONにできない(not JSON serializableというエラーが出る)
+            data.append({
+                'name': room.name,
+                'id': room.id,
+                'members': members_data,
+            })
+        return JsonResponse(data, safe=False)
