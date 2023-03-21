@@ -6,11 +6,12 @@ import Link from "next/link";
 const selectRoom = () => {
 
     const [chatroom, setChatroom] = useState([]);
+    const [personalID, setPersonalID] = useState("");
 
     useEffect(() => {
-        console.log(JSON.parse(localStorage.getItem("myID")))
         const userID=JSON.parse(localStorage.getItem("myID"));
         const RoomURL=`http://localhost:3130/chat/room/${userID}`
+        setPersonalID(userID)
         axios.get(RoomURL)
         .then((res) => {
             console.log(res.data);
@@ -35,7 +36,7 @@ const selectRoom = () => {
                 </div>
                 <Link
                   className="col-start-2 col-end-11 text-base"
-                  href={`http://localhost:3000/chat/room/${chatroom.id}`}
+                  href={`http://localhost:3000/chat/${personalID}/room/${chatroom.id}`}
                 >
                   {chatroom.name}
                 </Link>
