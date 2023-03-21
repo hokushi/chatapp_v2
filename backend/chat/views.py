@@ -81,3 +81,29 @@ def get_room_of_user(request, userid):
                 'members': members_data,
             })
         return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def get_message_of_room(request, roomid):
+    if request.method == 'GET':
+        room = Room.objects.get(id=roomid)
+        messages = room.messages.all()
+        data = []
+        for message in messages:
+            data.append({
+                'room': message.room.name,
+                'senderID': message.sender.userid,
+                'senderIcon': message.sender.id,
+                'content': message.content,
+                'timestamp': message.timestamp,
+            })
+        return JsonResponse(data, safe=False)
+
+    if request.method == 'POST':
+        datas = json.loads(request.body)
+        room = Room.objects.get(id=roomid)
+        sender = UserInfo.objects.get(userid=datas['senderID'])
+        content = datas['content']
+        Message.objects.create(room=room, sender=sender,
+                               content=content, timestamp=timezone.now())
+        return HttpResponse('message登録完了！')
