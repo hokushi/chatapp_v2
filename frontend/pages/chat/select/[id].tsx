@@ -35,10 +35,7 @@ const selectRoom = () => {
                 </div>
                 <Link
                   className="col-start-2 col-end-11 text-base"
-                  href={{
-                    pathname: `/chatroom/${chatroom.id}`,
-                    query: { name: chatroom.name },
-                  }}
+                  href={`http://localhost:3000/chat/room/${chatroom.id}`}
                 >
                   {chatroom.name}
                 </Link>
