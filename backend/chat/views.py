@@ -95,7 +95,10 @@ def get_message_of_room(request, roomid):
                 'senderID': message.sender.userid,
                 'senderIcon': message.sender.id,
                 'content': message.content,
-                'timestamp': message.timestamp,
+                'created_at': [timezone.localtime(message.timestamp).month,
+                               timezone.localtime(message.timestamp).day,
+                               timezone.localtime(message.timestamp).hour,
+                               timezone.localtime(message.timestamp).minute,]
             })
         return JsonResponse(data, safe=False)
 
