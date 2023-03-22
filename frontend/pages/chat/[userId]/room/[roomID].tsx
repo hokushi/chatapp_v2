@@ -1,11 +1,9 @@
 import {useState,useEffect} from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import Link from "next/link";
 
 const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
-    const router = useRouter();
-    const roomID = router.query.roomID;
-    const messageURL = `http://localhost:3130/chat/message/${roomID}`;
     const floatStyle = isMine ? "float-right" : "float-left";
     const colorStyle = isMine ? "bg-gray-300" : "bg-white";
     const [deleteCheck, setDeleteCheck] = useState(false);
@@ -42,9 +40,10 @@ const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
 const ChatRoom = () => {
     const router = useRouter();
     const roomID = router.query.roomID;
+    const myID = router.query.userId;
     const messageURL = `http://localhost:3130/chat/message/${roomID}`;
+    const backpageURL = `http://localhost:3000/chat/select/${myID}`;
     const [message, setMessage] = useState("");
-    const [sendURL, setSendURL] = useState("");
     const [messageList, setMessageList] = useState(undefined);
     const [renderAfterSend, setRenderAfterSend] = useState(false);
 
@@ -54,7 +53,6 @@ const ChatRoom = () => {
         console.log(router.query.roomID);
         /*localStorage.setItem("roomID", JSON.stringify(router.query.roomID));
         const roomID=Number(JSON.parse(localStorage.getItem("roomID")))*/
-        setSendURL(messageURL)
         axios.get(messageURL)
         .then((res) => {
             console.log(res.data);
@@ -76,10 +74,10 @@ const ChatRoom = () => {
           };
           console.log(sendInformation);
           axios
-            .post(sendURL, sendInformation)
+            .post(messageURL, sendInformation)
             .then((res) => {
-              setRenderAfterSend(!renderAfterSend);
               setMessage("");
+              console.log("送信完了")
             })
             .catch((err) => {
               console.log(err);
@@ -91,12 +89,12 @@ const ChatRoom = () => {
     return (
         <>
         <div className="fixed top-0 w-full py-1 mx-auto bg-slate-300 grid grid-cols-7">
-          <button
+          <Link
+            href={backpageURL}
             className="text-3xl col-start-1 col-end-2"
-            onClick={() => router.back()}
           >
             ▷
-          </button>
+          </Link>
           <h1 className="text-3xl flex justify-center col-start-3 col-end-6">
             {messageList[0].room}
           </h1>
