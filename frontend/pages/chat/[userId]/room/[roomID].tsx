@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import axios from "axios";
 
 const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
+    const router = useRouter();
+    const roomID = router.query.roomID;
+    const messageURL = `http://localhost:3130/chat/message/${roomID}`;
     const floatStyle = isMine ? "float-right" : "float-left";
     const colorStyle = isMine ? "bg-gray-300" : "bg-white";
     const [deleteCheck, setDeleteCheck] = useState(false);
@@ -38,13 +41,20 @@ const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
 
 const ChatRoom = () => {
     const router = useRouter();
+    const roomID = router.query.roomID;
+    const messageURL = `http://localhost:3130/chat/message/${roomID}`;
+    const [message, setMessage] = useState("");
+    const [sendURL, setSendURL] = useState("");
     const [messageList, setMessageList] = useState(undefined);
     const [renderAfterSend, setRenderAfterSend] = useState(false);
 
     useEffect(() => {
+        if(router.query){
         console.log(router)
         console.log(router.query.roomID);
-        const messageURL = `http://localhost:3130/chat/message/${router.query.roomID}`;
+        /*localStorage.setItem("roomID", JSON.stringify(router.query.roomID));
+        const roomID=Number(JSON.parse(localStorage.getItem("roomID")))*/
+        setSendURL(messageURL)
         axios.get(messageURL)
         .then((res) => {
             console.log(res.data);
@@ -53,8 +63,29 @@ const ChatRoom = () => {
         })
         .catch((err) => {
             console.log(err);
-        })
-    }, [renderAfterSend])
+        })}
+    }, [router.query])
+
+    const sendMessage = () => {
+        if (!message) {
+          return;
+        } else {
+          const sendInformation = {
+            senderID: JSON.parse(localStorage.getItem("myID")),
+            content: message,
+          };
+          console.log(sendInformation);
+          axios
+            .post(sendURL, sendInformation)
+            .then((res) => {
+              setRenderAfterSend(!renderAfterSend);
+              setMessage("");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      };
 
     if(messageList){
     return (
@@ -123,6 +154,26 @@ const ChatRoom = () => {
                     );
                   }
                 })}
+        </div>
+        <div className="fixed bottom-0 w-full px-0 mx-auto mt-10 bg-slate-300">
+          <form onSubmit={sendMessage}>
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              className="block w-full p-2 pl-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-gray-700 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+              placeholder="message"
+              required
+            />
+            <button
+              type="submit"
+              className="absolute right-0 bottom-0 bg-slate-300 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+            >
+              送信
+            </button>
+          </form>
         </div>
         </>
     );
