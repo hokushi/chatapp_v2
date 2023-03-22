@@ -1,5 +1,6 @@
 import {useState,useEffect} from "react";
 import { useRouter } from "next/router";
+import Check from "../../../components/check";
 import axios from "axios";
 import Link from "next/link";
 
@@ -7,8 +8,8 @@ const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
     const floatStyle = isMine ? "float-right" : "float-left";
     const colorStyle = isMine ? "bg-gray-300" : "bg-white";
     const [deleteCheck, setDeleteCheck] = useState(false);
-  
-    const messageID = sendthing.senderIcon;
+
+    const messageID = sendthing.content_id;
   
     return (
       <div className="overflow-hidden">
@@ -25,13 +26,13 @@ const MessageComponent = ({ sendthing, isMine, setterfunc }) => {
           {sendthing.created_at[2]}:{sendthing.created_at[3]}
         </div>
   
-        {/*{isMine && deleteCheck && (
+        {isMine && deleteCheck && (
           <Check
             messageID={messageID}
             setterfunc={setterfunc}
             setDeleteCheck={setDeleteCheck}
           />
-        )}*/}
+        )}
       </div>
     );
   };
@@ -41,14 +42,14 @@ const ChatRoom = () => {
     const router = useRouter();
     const roomID = router.query.roomID;
     const myID = router.query.userId;
-    const messageURL = `http://localhost:3130/chat/message/${roomID}`;
+    const messageURL = `http://localhost:3130/chat/room/${roomID}/message`;
     const backpageURL = `http://localhost:3000/chat/select/${myID}`;
     const [message, setMessage] = useState("");
     const [messageList, setMessageList] = useState(undefined);
     const [renderAfterSend, setRenderAfterSend] = useState(false);
 
     useEffect(() => {
-        if(router.query){
+        if(router.isReady){
         console.log(router)
         console.log(router.query.roomID);
         /*localStorage.setItem("roomID", JSON.stringify(router.query.roomID));
@@ -62,7 +63,7 @@ const ChatRoom = () => {
         .catch((err) => {
             console.log(err);
         })}
-    }, [router.query])
+    }, [router.query, renderAfterSend])
 
     const sendMessage = () => {
         if (!message) {

@@ -6,5 +6,6 @@ urlpatterns = [
     path('userinfo', views.user),  # ここにGETでuser一覧、POSTでuser作成
     path('room/<uuid:userid>', views.get_room_of_user),  # ここにGETでuserのroom一覧
     # ここにGETでroomのmessage一覧、POSTでmessage作成
-    path('message/<int:roomid>', views.get_message_of_room),
+    path('room/<int:roomid>/message', views.get_message_of_room),
+    path('message/<int:message_id>', views.message),  # ここにDELETEでmessage削除
 ]

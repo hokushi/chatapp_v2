@@ -57,6 +57,14 @@ def room(request):
 
 
 @csrf_exempt
+def message(request, message_id):
+    if request.method == 'DELETE':
+        message = Message.objects.get(id=message_id)
+        message.delete()
+        return HttpResponse('message削除完了！')
+
+
+@csrf_exempt
 def get_room_of_user(request, userid):
     if request.method == 'GET':
         user = UserInfo.objects.get(userid=userid)
@@ -95,6 +103,7 @@ def get_message_of_room(request, roomid):
                 'senderID': message.sender.userid,
                 'senderIcon': message.sender.id,
                 'content': message.content,
+                'content_id': message.id,
                 'created_at': [timezone.localtime(message.timestamp).month,
                                timezone.localtime(message.timestamp).day,
                                timezone.localtime(message.timestamp).hour,
