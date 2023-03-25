@@ -42,7 +42,7 @@ const ChatRoom = () => {
     const router = useRouter();
     const roomID = router.query.roomID;
     const myID = router.query.userId;
-    const messageURL = `http://localhost:3130/chat/room/${roomID}/message`;
+    const messageURL = `http://localhost:3130/chat/rest_room/${roomID}/message`;
     const backpageURL = `http://localhost:3000/chat/select/${myID}`;
     const [message, setMessage] = useState("");
     const [messageList, setMessageList] = useState(undefined);

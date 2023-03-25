@@ -15,7 +15,7 @@ export default function Check({
   const cancelButtonRef = useRef(null);
 
   const deleteMessage = (messageID) => {
-    const DELETE_URL = `http://localhost:3130/chat/message/${messageID}`;
+    const DELETE_URL = `http://localhost:3130/chat/rest_message/${messageID}`;
     axios.delete(DELETE_URL).then((res) => {
       console.log("正常に削除しました");
       setterfunc();

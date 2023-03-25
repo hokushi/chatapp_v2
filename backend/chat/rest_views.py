@@ -1,3 +1,6 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import render
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -7,11 +10,11 @@ from .models import Message
 from .models import UserInfo
 from django.utils import timezone
 
-
 # Create your views here.
-@csrf_exempt
-def user(request):
-    if request.method == 'GET':
+
+
+class UserView(APIView):
+    def get(self, request):
         users = UserInfo.objects.all()
         data = []
         for user in users:
@@ -22,10 +25,10 @@ def user(request):
                 'email': user.email,
                 'password': user.password,
             })
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
-    if request.method == 'POST':
-        datas = json.loads(request.body)
+    def post(self, request):
+        datas = request.data
         print(datas)
         name = datas['name']
         userid = datas['userid']
@@ -34,12 +37,11 @@ def user(request):
         password = datas['password']
         UserInfo.objects.create(name=name, userid=userid, username=username,
                                 email=email, password=password)
-        return HttpResponse('user登録完了！')
+        return Response('user登録完了！')
 
 
-@csrf_exempt
-def room(request):
-    if request.method == 'GET':
+class RoomView(APIView):
+    def get(self, request):
         rooms = Room.objects.all()
         data = []
         for room in rooms:
@@ -47,31 +49,29 @@ def room(request):
                 'name': room.name,
                 'id': room.id,
             })
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
-    if request.method == 'POST':
-        datas = json.loads(request.body)
+    def post(self, request):
+        datas = request.data
         name = datas['name']
         Room.objects.create(name=name)
-        return HttpResponse('room登録完了！')
+        return Response('room登録完了！')
 
 
-@csrf_exempt
-def message(request, message_id):
-    if request.method == 'DELETE':
+class MessageView(APIView):
+    def delete(self, request, message_id):
         message = Message.objects.get(id=message_id)
         message.delete()
-        return HttpResponse('message削除完了！')
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@csrf_exempt
-def get_room_of_user(request, userid):
-    if request.method == 'GET':
+class get_room_of_userView(APIView):
+    def get(self, request, userid):
         user = UserInfo.objects.get(userid=userid)
         rooms = user.rooms.all()
         data = []
         for room in rooms:
-            members = room.members.all()  # UserInfoインスタンスの配列
+            members = room.members.all()
             members_data = []
             for member in members:
                 members_data.append({
@@ -81,26 +81,23 @@ def get_room_of_user(request, userid):
                     'email': member.email,
                     'password': member.password,
                 })
-            # members_dataは、Pythonの辞書の配列 (インスタンス→辞書に)
-            # 辞書はJSONにできる、インスタンスはJSONにできない(not JSON serializableというエラーが出る)
             data.append({
                 'name': room.name,
                 'id': room.id,
                 'members': members_data,
             })
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
 
-@csrf_exempt
-def get_message_of_room(request, roomid):
-    if request.method == 'GET':
+class get_message_of_roomView(APIView):
+    def get(self, request, roomid):
         room = Room.objects.get(id=roomid)
         messages = room.messages.all()
         data = []
         for message in messages:
             data.append({
-                'room': message.room.name,
-                'senderID': message.sender.userid,
+                "room": message.room.name,
+                "senderID": message.sender.userid,
                 'senderIcon': message.sender.id,
                 'content': message.content,
                 'content_id': message.id,
@@ -109,13 +106,13 @@ def get_message_of_room(request, roomid):
                                timezone.localtime(message.timestamp).hour,
                                timezone.localtime(message.timestamp).minute,]
             })
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
-    if request.method == 'POST':
-        datas = json.loads(request.body)
+    def post(self, request, roomid):
+        datas = request.data
         room = Room.objects.get(id=roomid)
         sender = UserInfo.objects.get(userid=datas['senderID'])
         content = datas['content']
         Message.objects.create(room=room, sender=sender,
                                content=content, timestamp=timezone.now())
-        return HttpResponse('message登録完了！')
+        return Response('message登録完了！')
