@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import axios from "axios";
 import Link from "next/link";
 
@@ -10,7 +9,7 @@ const selectRoom = () => {
 
     useEffect(() => {
         const userID=JSON.parse(localStorage.getItem("myID"));
-        const RoomURL=`http://localhost:3130/chat/room/${userID}`
+        const RoomURL=`http://localhost:3130/chat/rest_room/${userID}`
         setPersonalID(userID)
         axios.get(RoomURL)
         .then((res) => {

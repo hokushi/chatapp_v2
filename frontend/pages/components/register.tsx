@@ -6,7 +6,7 @@ import InputHookform from "../components/input-hookform";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const Register = () => {
-  const USERS_URL = "http://localhost:3130/chat/userinfo";
+  const USERS_URL = "http://localhost:3130/chat/rest_user";
   const router = useRouter();
 
   const {
