@@ -71,6 +71,7 @@ class get_room_of_userView(APIView):
         rooms = user.rooms.all()
         data = []
         for room in rooms:
+
             members = room.members.all()
             members_data = []
             for member in members:
